@@ -1,6 +1,7 @@
 import pygame 
 import sys 
 from settings import Settings 
+from raincloud import Raincloud
 
 class Raindrops: 
 
@@ -8,6 +9,7 @@ class Raindrops:
 		pygame.init()
 		self.settings = Settings()
 		self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+		self.raincloud = Raincloud(self)
 		pygame.display.set_caption("Raindrops Keep Falling On My Head")
 
 	def run_game(self): 
@@ -23,6 +25,7 @@ class Raindrops:
 
 	def _update_screen(self):
 		self.screen.fill(self.settings.bg_color)
+		self.raincloud.blitme()
 		pygame.display.flip()
 
 if __name__ == "__main__":
