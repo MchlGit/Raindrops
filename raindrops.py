@@ -19,6 +19,7 @@ class Raindrops:
 	def run_game(self): 
 		while True: 
 			self._check_events()
+			self._update_drops()
 			self._update_screen()
 
 	def _check_events(self): 
@@ -26,46 +27,62 @@ class Raindrops:
 			if event.type == pygame.QUIT: 
 				sys.exit()
 
-	def _create_rain(self): 
+	def _get_raincloud_buffer(self): 
+		return self.settings.screen_width - self.raincloud.rect.width
+
+	def _get_raindrop_size(self): 
 		raindrop = Raindrop(self)
-		raindrop_width, raindrop_height = raindrop.rect.size
-		raincloud_height = self.raincloud.rect.height
-		raincloud_buffer = self.settings.screen_width - self.raincloud.rect.width
+		return raindrop.rect.size
 
-		available_width = self.settings.screen_width - (raincloud_buffer + 2 * raindrop_width)
-		num_drops = available_width // (2 * raindrop_width)
-		print(num_drops)
-		print(available_width)
-		print(raindrop_width)
+	def _get_drops_per_row(self): 
+		raindrop_width, raindrop_height = self._get_raindrop_size()
+		available_width = self.settings.screen_width - (self._get_raincloud_buffer() + 2 * raindrop_width)
+		return available_width // (2 * raindrop_width)
 
+	def _get_num_rows(self): 
+		raindrop_width, raindrop_height = self._get_raindrop_size()
 		available_height = self.settings.screen_height - (2*raindrop_height)
-		num_rows = available_height // (2 * raindrop_height)
-		print(num_rows)
-		print(available_height)
-		print(raindrop_height)
-		print(raincloud_height)#600 screen height
+		return available_height // (2 * raindrop_height)
 
-		for row_number in range(num_rows): 
-			for drop_number in range(num_drops): 
-				self._create_drop(drop_number, row_number)
+	def _get_drop_start_y(self): 
+		return int(self.raincloud.rect.height / 2)
 
-	def _create_drop(self, drop_number, row_number): 
-		raincloud_buffer = self.settings.screen_width - self.raincloud.rect.width
+	def _update_drops(self): 
+		self.drops.update()
+		raindrop_width, raindrop_height = self._get_raindrop_size()
+		count = 0
+		num_drops = self._get_drops_per_row()
 
-		raincloud_height = self.raincloud.rect.height
+		for drop in self.drops.copy(): 
+			if drop.rect.bottom > self.settings.screen_height: 
+				self.drops.remove(drop)
+			elif drop.rect.bottom == self._get_drop_start_y() + 3 * raindrop_height:
+				count = count + 1
+				print(count)
+			if count == num_drops:
+				count = 0
+				for drop_number in range(num_drops): 
+					self._create_drop(drop_number)
+
+	def _create_rain(self): 
+		num_drops = self._get_drops_per_row()
+		for drop_number in range(num_drops): 
+			self._create_drop(drop_number)
+
+	def _create_drop(self, drop_number): 
 		new_drop = Raindrop(self)
 		drop_width, drop_height = new_drop.rect.size
-		new_drop.x = drop_number * drop_width * 2 + raincloud_buffer//2 + 2*drop_width
+		new_drop.x = drop_number * drop_width * 2 + self._get_raincloud_buffer()//2 + 2*drop_width
 
 		new_drop.rect.x = int(new_drop.x)
-		new_drop.rect.y = row_number * drop_height * 2 + raincloud_height//2 + drop_height
+		new_drop.rect.y = self._get_drop_start_y()
 
 		self.drops.add(new_drop)
 
 	def _update_screen(self):
 		self.screen.fill(self.settings.bg_color)
-		self.raincloud.blitme()
 		self.drops.draw(self.screen)
+		self.raincloud.blitme()
 		pygame.display.flip()
 
 if __name__ == "__main__":

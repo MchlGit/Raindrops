@@ -14,8 +14,8 @@ class Raindrop(Sprite):
 		self.rect.x = self.rect.width
 		self.rect.y = self.rect.height
 
-		self.x = float(self.rect.x)
+		#self.y = float(self.rect.y)
 
 	def update(self): 
-		self.y += self.settings.drop_speed
-		self.rect.y = self.y
+		self.rect.y += self.settings.drop_speed
+		#self.rect.y = self.y

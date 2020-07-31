@@ -3,4 +3,4 @@ class Settings:
 		self.screen_width = 500
 		self.screen_height = 600
 		self.bg_color = (130, 150, 200)
-		self.drop_speed = 4
+		self.drop_speed = 1
